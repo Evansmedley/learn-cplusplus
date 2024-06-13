@@ -205,3 +205,118 @@ std::cout << std::unitbuf; // enable automatic flushing for std::cout (for debug
 - Step over: executes next statement but will not enter function calls, executes an entire function without stopping and pauses after function call
 - Step out: Executes all remaining code in the function currently being executed and pauses after the current function has completely run
 - Continue: go to next breakpoint or end of program
+
+
+# 4 Fundamental Data Types
+
+## 4.1 Intro
+
+| Types                               | Category                | Meaning                                    | Example   |
+|-------------------------------------|-------------------------|--------------------------------------------|-----------|
+| float                               | Floating Point          | a number with a fractional part            | 3.14159   |
+| double                              | Floating Point          | a number with a fractional part            | 3.14159   |
+| long double                         | Floating Point          | a number with a fractional part            | 3.14159   |
+| bool                                | Integral (Boolean)      | true or false                              | true      |
+| char                                | Integral (Character)    | a single character of text                 | ‘c’       |
+| wchar_t                             | Integral (Character)    | a single character of text                 | ‘c’       |
+| char8_t (C++20)                     | Integral (Character)    | a single character of text                 | ‘c’       |
+| char16_t (C++11)                    | Integral (Character)    | a single character of text                 | ‘c’       |
+| char32_t (C++11)                    | Integral (Character)    | a single character of text                 | ‘c’       |
+| short int                           | Integral (Integer)      | positive and negative whole numbers, 0     | 64        |
+| int                                 | Integral (Integer)      | positive and negative whole numbers, 0     | 64        |
+| long int                            | Integral (Integer)      | positive and negative whole numbers, 0     | 64        |
+| long long int (C++11)               | Integral (Integer)      | positive and negative whole numbers, 0     | 64        |
+| std::nullptr_t (C++11)              | Null Pointer            | a null pointer                             | nullptr   |
+| void                                | Void                    | no type                                    | n/a       |
+
+
+## Void
+
+- Means no type, incomplete type (declared but not yet defined)
+
+
+## Object Sizes
+
+| Category         | Type            | Minimum Size | Typical Size        | Note                   |
+|------------------|-----------------|--------------|---------------------|------------------------|
+| Boolean          | bool            | 1 byte       | 1 byte              |                        |
+| character        | char            | 1 byte       | 1 byte              | always exactly 1 byte  |
+|                  | wchar_t         | 1 byte       | 2 or 4 bytes        |                        |
+|                  | char8_t         | 1 byte       | 1 byte              |                        |
+|                  | char16_t        | 2 bytes      | 2 bytes             |                        |
+|                  | char32_t        | 4 bytes      | 4 bytes             |                        |
+| integer          | short           | 2 bytes      | 2 bytes             |                        |
+|                  | int             | 2 bytes      | 4 bytes             |                        |
+|                  | long            | 4 bytes      | 4 or 8 bytes        |                        |
+|                  | long long       | 8 bytes      | 8 bytes             |                        |
+| floating point   | float           | 4 bytes      | 4 bytes             |                        |
+|                  | double          | 8 bytes      | 8 bytes             |                        |
+|                  | long double     | 8 bytes      | 8, 12, or 16 bytes  |                        |
+| pointer          | std::nullptr_t  | 4 bytes      | 4 or 8 bytes        |                        |
+
+- 'sizeof(...)' can be used to check size, does not include dynamically allocated memory used of course
+
+## Signed Ints
+
+- By default all ints are signed
+- Signed keyword prefix and int suffix are redundant (goes before name during declaration)
+- Overflow can occur
+- n-bit signed variable has a range og (-2^(n-1), 2^(n-1)-1)
+- Integer division is like floor(x/y), remainder is dropped
+
+## Unsigned Ints
+
+- Use unsigned prefix to use unsigned ints
+- Out of range unsigned value is integer-divided by 1+largest_number_of_type (eg. 255 + 1)
+- AVOID
+- Math between unsigned and signed will convert signed to unsigned
+- Good for bit manipulation, array indexing
+
+## Fixed Width Ints
+
+- C++ only guarantees that integer variables will have a minimum size (could be larger)
+- C99 defined set of fixed-width integers (accessed with <cstdint> in std namespaces)
+- Best practice
+  - Prefer int when size doesn't matter and variable is short lived
+  - Use std::int#_t for storing a quantity that needs a guaranteed range
+  - Use std::uint#_t for bit manipulation (or well-defined wrap around behavior)
+- Avoid
+  - short and long
+  - Unsigned types
+  - 8-bit fixed-width ints (may be treated like a char instead of int)
+  - fast and least width types
+  - Compiler-specific fixed width ints
+- What integral type does sizeof return? -> std::size_t (implementation defined unsigned int)
+- std::size_t imposes a strict upper limit to object sizes
+
+## Scientific Notation
+
+- 1.2 * 10^4 -> 1.2e4
+
+## Floats
+
+- By default std::cout does not print the fractional part of a number if it is 0
+- Can override default precision of std::cout using output manipulator << std::setprecision(5)
+- Favour double over float
+- posinf, neginf and nan are sometimes available
+
+## Booleans
+
+- Use bool
+- Printing booleans: 0 -> false, 1 -> true
+- Output manipulators: std::boolalpha and std::noboolalpha to print as true and false
+- For std::cin to interpret true and false for bools, use std::boolalpha input manipulator
+
+## Chars
+
+- SINGLE QUOTES 
+- \x6F is how hex digits are written, they will be converted to char type
+- Use stand-along chars in single quotes, easier for compiler to optimize
+
+## Type Conversion and Static Cast
+
+- int to double is safe, double to int is not
+- Explicit type conversion static_cast<new_type>(expression) (no warnings about data loss when you explicit cast)
+
+
+# Constants and Strings
