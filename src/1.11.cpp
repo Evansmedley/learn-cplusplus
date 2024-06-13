@@ -1,6 +1,6 @@
 #include <iostream>
 
-int main() 
+int one_point_eleven() 
 {
     std::cout << "Enter an integer: ";
 
