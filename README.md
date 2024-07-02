@@ -1,6 +1,6 @@
 # Learn C++
 
-I am following [learncpp.com](https://www.learncpp.com/) which has proven to be a thorough and easy to understand resource for learning C++!
+I am following [learncpp.com](https://www.learncpp.com/) which has proven to be a thorough and easy to understand resource for learning C++! My notes from the chapters of this course are summarized in [notes.md](notes.md).
 
 ## IDE Setup
 
