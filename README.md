@@ -1,5 +1,7 @@
 # Learn C++
 
+I am following [learncpp.com](https://www.learncpp.com/) which has proven to be a thorough and easy to understand resource for learning C++!
+
 ## IDE Setup
 
 These instructions are for C++20 with VSCode on Ubuntu 22.04.
