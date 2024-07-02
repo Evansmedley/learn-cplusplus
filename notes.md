@@ -610,3 +610,36 @@ int main()
 - Modification of a std::string variable will invalidate any std::string_view instances watching that string
 - Be careful about returning std::string_view from a function if it is pointing at a std::string inside of the function that will be destroyed (different than c-style literals as they will exist for the entire program)
 - Can use remove_prefix() and remove_suffix() to modify a std::string_view's view (like closing the curtains)
+
+
+
+# Operators
+<table class="cpp-table" data-ezoic-video-excluded="1"><tbody><tr><th>Prec/Ass</th><th>Operator</th><th>Description</th><th>Pattern</th></tr><tr><td>1 L-&gt;R</td><td>::<br>::</td><td>Global scope (unary)<br>Namespace scope (binary)</td><td>::name<br>class_name::member_name<br></td></tr><tr><td>2 L-&gt;R</td><td>()<br>()<br>type()<br>type{}<br>[]<br>.<br>-&gt;<br>++<br>––<br>typeid<br>const_cast<br>dynamic_cast<br>reinterpret_cast<br>static_cast<br>sizeof…<br>noexcept<br>alignof</td><td>Parentheses<br>Function call<br>Functional cast<br>List init temporary object (C++11)<br>Array subscript<br>Member access from object<br>Member access from object ptr<br>Post-increment<br>Post-decrement<br>Run-time type information<br>Cast away const<br>Run-time type-checked cast<br>Cast one type to another<br>Compile-time type-checked cast<br>Get parameter pack size<br>Compile-time exception check<br>Get type alignment</td><td>(expression)<br>function_name(arguments)<br>type(expression)<br>type{expression}<br>pointer[expression]<br>object.member_name<br>object_pointer-&gt;member_name<br>lvalue++<br>lvalue––<br>typeid(type) or typeid(expression)<br>const_cast&lt;type&gt;(expression)<br>dynamic_cast&lt;type&gt;(expression)<br>reinterpret_cast&lt;type&gt;(expression)<br>static_cast&lt;type&gt;(expression)<br>sizeof…(expression)<br>noexcept(expression)<br>alignof(type)</td></tr><tr><td>3 R-&gt;L</td><td>+<br>-<br>++<br>––<br>!<br>not<br>~<br>(type)<br>sizeof<br>co_await<br>&amp;<br>*<br>new<br>new[]<br>delete<br>delete[]</td><td>Unary plus<br>Unary minus<br>Pre-increment<br>Pre-decrement<br>Logical NOT<br>Logical NOT<br>Bitwise NOT<br>C-style cast<br>Size in bytes<br>Await asynchronous call<br>Address of<br>Dereference<br>Dynamic memory allocation<br>Dynamic array allocation<br>Dynamic memory deletion<br>Dynamic array deletion</td><td>+expression<br>-expression<br>++lvalue<br>––lvalue<br>!expression<br>not expression<br>~expression<br>(new_type)expression<br>sizeof(type) or sizeof(expression)<br>co_await expression (C++20)<br>&amp;lvalue<br>*expression<br>new type<br>new type[expression]<br>delete pointer<br>delete[] pointer</td></tr><tr><td>4 L-&gt;R</td><td>-&gt;*<br>.*</td><td>Member pointer selector<br>Member object selector</td><td>object_pointer-&gt;*pointer_to_member<br>object.*pointer_to_member</td></tr><tr><td>5 L-&gt;R</td><td>*<br>/<br>%</td><td>Multiplication<br>Division<br>Remainder</td><td>expression * expression<br>expression / expression<br>expression % expression</td></tr><tr><td>6 L-&gt;R</td><td>+<br>-</td><td>Addition<br>Subtraction</td><td>expression + expression<br>expression - expression</td></tr><tr><td>7 L-&gt;R</td><td>&lt;&lt;<br>&gt;&gt;</td><td>Bitwise shift left / Insertion<br>Bitwise shift right / Extraction</td><td>expression &lt;&lt; expression<br>expression &gt;&gt; expression</td></tr><tr><td>8 L-&gt;R</td><td>&lt;=&gt;</td><td>Three-way comparison (C++20)</td><td>expression &lt;=&gt; expression</td></tr><tr><td>9 L-&gt;R</td><td>&lt;<br>&lt;=<br>&gt;<br>&gt;=</td><td>Comparison less than<br>Comparison less than or equals<br>Comparison greater than<br>Comparison greater than or equals</td><td>expression &lt; expression<br>expression &lt;= expression<br>expression &gt; expression<br>expression &gt;= expression</td></tr><tr><td>10 L-&gt;R</td><td>==<br>!=</td><td>Equality<br>Inequality</td><td>expression == expression<br>expression != expression</td></tr><tr><td>11 L-&gt;R</td><td>&amp;</td><td>Bitwise AND</td><td>expression &amp; expression</td></tr><tr><td>12 L-&gt;R</td><td>^</td><td>Bitwise XOR</td><td>expression ^ expression</td></tr><tr><td>13 L-&gt;R</td><td>|</td><td>Bitwise OR</td><td>expression | expression</td></tr><tr><td>14 L-&gt;R</td><td>&amp;&amp;<br>and</td><td>Logical AND<br>Logical AND</td><td>expression &amp;&amp; expression<br>expression and expression<p></p></td></tr><tr><td>15 L-&gt;R</td><td>||<br>or</td><td>Logical OR<br>Logical OR</td><td>expression || expression<br>expression or expression</td></tr><tr><td>16 R-&gt;L</td><td>throw<br>co_yield<br>?:<br>=<br>*=<br>/=<br>%=<br>+=<br>-=<br>&lt;&lt;=<br>&gt;&gt;=<br>&amp;=<br>|=<br>^=</td><td>Throw expression<br>Yield expression (C++20)<br>Conditional<br>Assignment<br>Multiplication assignment<br>Division assignment<br>Remainder assignment<br>Addition assignment<br>Subtraction assignment<br>Bitwise shift left assignment<br>Bitwise shift right assignment<br>Bitwise AND assignment<br>Bitwise OR assignment<br>Bitwise XOR assignment</td><td>throw expression<br>co_yield expression<br>expression ? expression : expression<br>lvalue = expression<br>lvalue *= expression<br>lvalue /= expression<br>lvalue %= expression<br>lvalue += expression<br>lvalue -= expression<br>lvalue &lt;&lt;= expression<br>lvalue &gt;&gt;= expression<br>lvalue &amp;= expression<br>lvalue |= expression<br>lvalue ^= expression</td></tr><tr><td>17 L-&gt;R</td><td>,</td><td>Comma operator</td><td>expression, expression</td></tr></tbody></table>
+
+## Arithmetic operators
+- Unary -> +x, -x (no space for readability, unary + is redundant)
+- Binary -> self explanatory
+- For integer and floating point division, can use static_cast<> to conver an integer to a float in order to do floating point division
+
+## Remainder and exponentiation
+- Remainder operator works with negative operands, x % y always returns results with the sign of x
+- Instead of ^ being exponentiation, it is bitwise xor, instead include \<cmath\> header and use std::pow(x, y)
+- Integer exponentiation will likely overflow, be careful
+
+## Increment and decrement
+| Operator                        | Symbol | Form | Operation                                       |
+|---------------------------------|--------|------|-------------------------------------------------|
+| Prefix increment (pre-increment)| ++     | ++x  | Increment x, then return x                      |
+| Prefix decrement (pre-decrement)| ––     | ––x  | Decrement x, then return x                      |
+| Postfix increment (post-increment)| ++   | x++  | Copy x, then increment x, then return the copy  |
+| Postfix decrement (post-decrement)| ––   | x––  | Copy x, then decrement x, then return the copy  |
+
+- In cases where either can be used, prefer the prefix as it is faster
+
+## Comma operator
+- Evaluate x, then y, then return y
+- Dangerous, avoid except in for loops
+
+## Logical operators
+- Use != with boolean operands as an XOR
+- Can use or, and and not in C++ (but symbolic is better)
