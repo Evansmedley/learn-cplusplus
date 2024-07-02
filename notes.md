@@ -643,3 +643,101 @@ int main()
 ## Logical operators
 - Use != with boolean operands as an XOR
 - Can use or, and and not in C++ (but symbolic is better)
+
+
+# Bit manipulation
+
+## std::bitset
+- For bit manipulation, unambiguously use unsigned integers (or std::bitset)
+- std::bitset has member functions .set(idx), .flip(idx), .reset(idx), test(idx) (respectively for setting to 1, flipping, setting to 0, query if 1 or 0 get bool)
+- Using [[maybe_unused]] constexpr int bitname { idx }; to name bits makes code readable
+- std::bitset is good for convenience, not memory savings
+- size, count, all, any, none are also member functions for std::bitset
+```
+#include <bitset>
+#include <iostream>
+
+int main()
+{
+    [[maybe_unused]] constexpr int  isHungry   { 0 };
+    [[maybe_unused]] constexpr int  isSad      { 1 };
+    [[maybe_unused]] constexpr int  isMad      { 2 };
+    [[maybe_unused]] constexpr int  isHappy    { 3 };
+    [[maybe_unused]] constexpr int  isLaughing { 4 };
+    [[maybe_unused]] constexpr int  isAsleep   { 5 };
+    [[maybe_unused]] constexpr int  isDead     { 6 };
+    [[maybe_unused]] constexpr int  isCrying   { 7 };
+
+    std::bitset<8> me{ 0b0000'0101 }; // we need 8 bits, start with bit pattern 0000 0101
+    me.set(isHappy);      // set bit position 3 to 1 (now we have 0000 1101)
+    me.flip(isLaughing);  // flip bit 4 (now we have 0001 1101)
+    me.reset(isLaughing); // set bit 4 back to 0 (now we have 0000 1101)
+
+    std::cout << "All the bits: " << me << '\n';
+    std::cout << "I am happy: " << me.test(isHappy) << '\n';
+    std::cout << "I am laughing: " << me.test(isLaughing) << '\n';
+
+    return 0;
+}
+```
+
+## Bitwise operators
+- USE WITH UNSIGNED OPERANDS OR std::bitset
+- Bits shifted outside of the bitwidth are lost
+- Assignment operators exist as well
+
+| Operator       | Symbol | Form   | Operation                                   |
+|----------------|--------|--------|---------------------------------------------|
+| left shift     | <<     | x << y | all bits in x shifted left y bits           |
+| right shift    | >>     | x >> y | all bits in x shifted right y bits          |
+| bitwise NOT    | ~      | ~x     | all bits in x flipped                       |
+| bitwise AND    | &      | x & y  | each bit in x AND each bit in y             |
+| bitwise OR     | \|     | x \| y | each bit in x OR each bit in y              |
+| bitwise XOR    | ^      | x ^ y  | each bit in x XOR each bit in y             |
+
+## Bit manipulation and bit masks
+- A bit mask is a predefined set of bits that is used to select which specific bits will be modified by subsequent operations
+
+```
+#include <cstdint>
+
+constexpr std::uint8_t mask0{ 0b0000'0001 }; // represents bit 0
+constexpr std::uint8_t mask1{ 0b0000'0010 }; // represents bit 1
+constexpr std::uint8_t mask2{ 0b0000'0100 }; // represents bit 2
+constexpr std::uint8_t mask3{ 0b0000'1000 }; // represents bit 3
+constexpr std::uint8_t mask4{ 0b0001'0000 }; // represents bit 4
+constexpr std::uint8_t mask5{ 0b0010'0000 }; // represents bit 5
+constexpr std::uint8_t mask6{ 0b0100'0000 }; // represents bit 6
+constexpr std::uint8_t mask7{ 0b1000'0000 }; // represents bit 7
+```
+or
+```
+constexpr std::uint8_t mask0{ 0x01 }; // hex for 0000 0001
+constexpr std::uint8_t mask1{ 0x02 }; // hex for 0000 0010
+constexpr std::uint8_t mask2{ 0x04 }; // hex for 0000 0100
+constexpr std::uint8_t mask3{ 0x08 }; // hex for 0000 1000
+constexpr std::uint8_t mask4{ 0x10 }; // hex for 0001 0000
+constexpr std::uint8_t mask5{ 0x20 }; // hex for 0010 0000
+constexpr std::uint8_t mask6{ 0x40 }; // hex for 0100 0000
+constexpr std::uint8_t mask7{ 0x80 }; // hex for 1000 0000
+```
+or
+```
+constexpr std::uint8_t mask0{ 1 << 0 }; // 0000 0001
+constexpr std::uint8_t mask1{ 1 << 1 }; // 0000 0010
+constexpr std::uint8_t mask2{ 1 << 2 }; // 0000 0100
+constexpr std::uint8_t mask3{ 1 << 3 }; // 0000 1000
+constexpr std::uint8_t mask4{ 1 << 4 }; // 0001 0000
+constexpr std::uint8_t mask5{ 1 << 5 }; // 0010 0000
+constexpr std::uint8_t mask6{ 1 << 6 }; // 0100 0000
+constexpr std::uint8_t mask7{ 1 << 7 }; // 1000 0000
+```
+- Manipulating the bits can be done like this
+```
+std::uint8_t flags{ 0b0000'0101 }; // 8 bits in size means room for 8 flags
+
+flags &= ~mask2; // turn off bit 2
+flags |= mask1; // turn on bit 1
+flags ^= mask2; // flip bit 2
+```
+- std::bitset also supports the full set of bitwise operators
