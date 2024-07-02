@@ -319,4 +319,294 @@ std::cout << std::unitbuf; // enable automatic flushing for std::cout (for debug
 - Explicit type conversion static_cast<new_type>(expression) (no warnings about data loss when you explicit cast)
 
 
-# Constants and Strings
+# 5 Constants and Strings
+
+## Constant variables
+
+- 3 types -> constan vars, object-like macros, enumerated constants
+
+### 'const'
+- Declared with 'const' qualifier before type (good practise), must be initialized upon definition
+- Common naming techniques include all-caps (from C), k prefix (more common in C++, e.g. kEarthGravity), name the same as regular variables (this is good!)
+- Function params can be constants (value not changed inside the function), don't declare constant params when passing by value
+- Return values can also be const, again don't use when returning by value
+
+### '#define MACRO'
+- Preprocessor macros just substitute values during compilation
+- Prefer 'const' to preprocessor macros because
+  - They don't follow normal scoping rules
+  - Hard to debug
+  - Macro substitution behaves differently than everything else in C++
+
+### Type Qualifiers
+- Keyword that is applied to a type that modifies how the type behaves
+- 'const' and 'volatile' are type qualifiers
+- 'volatile' is used to tell the compiler that an object may have its value changed at any time (rarely used)
+
+## Literals
+- Values inserted directly into code (e.g. 5, true, 4.5, "Test", '\n')
+- Literal suffixes can be used to change the type (mostly not used except for f, use 'L' over 'l')
+- Floating point literals have a type of double by default, f or F is used
+- Strings are enclosed in "", char literals are enclosed in ''
+- Strings are not a fundamental type in C++, instead have a strange and complicated type that is hard to work with (C strings inherited from C)
+- Important things to know about c-style string literals
+  - All c-style literals have implicit null terminator '\0'
+  - c-style string literals are const objects that are created at the start of a program and guaranteed to exist for the entirety of the program
+  - std::string and std::string_view literals create temporary objects (must be used immediately and are destroyed at the end of the full expression in which they are created)
+- Don't use magic numbers (name variables so that readers understand what the magic number represents)
+
+| Data type       | Suffix                                | Meaning                               |
+|-----------------|---------------------------------------|---------------------------------------|
+| integral        | u or U                                | unsigned int                          |
+| integral        | l or L                                | long                                  |
+| integral        | ul, uL, Ul, UL, lu, lU, Lu, LU        | unsigned long                         |
+| integral        | ll or LL                              | long long                             |
+| integral        | ull, uLL, Ull, ULL, llu, llU, LLu, LLU | unsigned long long                    |
+| integral        | z or Z                                | The signed version of std::size_t (C++23) |
+| integral        | uz, uZ, Uz, UZ, zu, zU, Zu, ZU        | std::size_t (C++23)                   |
+| floating point  | f or F                                | float                                 |
+| floating point  | l or L                                | long double                           |
+| string          | s                                     | std::string                           |
+| string          | sv                                    | std::string_view                      |
+
+## Decimal, Octal, Hex, Binary
+```
+int main()
+{
+  int octal { 012 };      // '0' indicates octal
+  int decimal { 12 };     // Always assumes decimal
+  int hex { 0x AA };      // "0x" indicates hex
+  int bin { 0b00 };       // "0b" indicates binary
+}
+```
+- Can use ' quotation mark as a digit separator when writing numbers (but cannot occur before the first digit of a value)
+- By default, all C++ values are outputted in decimal (output format can be changed using std::dec, std::oct and std::hex I/O manipulators, effect is lasting)
+```
+int main()
+{
+  std::cout << x      // Default decimal
+  std::cout << std::hex << x      // Now hex
+  std::cout << x       // Still hex
+  std::cout << std::dec << x     // Back to decimal
+}
+```
+- Printing binary values is done using std::bitset type, define std::bitset variable
+```
+int main()
+{
+  std::bitset<8> bin{ 0b1100'0101 };
+  std::cout << bin1;
+}
+```
+- C++20 and 23 provide better options available via format library in 20 and print library in 23
+
+## Constant expressions and compile-time optimization
+- Prefer 'int x { 7 };' over 'int x { 3 + 4 };' because the former can be evaluated at compile time while the latter will be evaluated at runtime
+- Constant expressions are expressions containing only compile-time constants and operators/functions that support compile-time evaluation
+  - Includes: literals, const integral variables with a constant expression initializer, constexpr variables, enumerators, non-type template params
+```
+int main()
+{
+    // Non-const variables:
+    int a { 5 };                 // 5 is a constant expression
+    double b { 1.2 + 3.4 };      // 1.2 + 3.4 is a constant expression
+
+    // Const integral variables with a constant expression initializer
+    // are compile-time constants:
+    const int c { 5 };           // 5 is a constant expression
+    const int d { c };           // c is a constant expression
+    const long e { c + 2 };      // c + 2 is a constant expression
+
+    // Other const variables are runtime constants:
+    const int f { a };           // a is not a constant expression
+    const int g { a + 1 };       // a + 1 is not a constant expression
+    const long h { a + c };      // a + c is not a constant expression
+    const int i { getNumber() }; // getNumber() is not a constant expression
+
+    const double j { b };        // b is not a constant expression
+    const double k { 1.2 };      // 1.2 is a constant expression
+
+    return 0;
+}
+```
+- Constant expressions -> always eligible for compile-time evaluation (faster + smaller code), more likely to show errors at compile time (safer, easier to test)
+- Runtime expressions -> only the type of the expression is known at compile-time
+- Subexpressions can be optimized if constant
+- Learn more about constant expressions
+
+## Constexpr variables
+- One way to make a compile-time constant variable is to use the const keyword, if const variable has an integral type and a constant expression initialized, it is a compile-time constant
+- When using const, integral variables could end up as either compile-time costs or runtime consts depending on whether the initializer is a constant expression or not (hard to tell whether const variable is actually a compile-time constant or not)
+```
+int a { 5 };       // not const at all
+const int b { a }; // obviously a runtime const (since initializer is non-const)
+const int c { 5 }; // obviously a compile-time const (since initializer is a constant expression)
+
+const int d { someVar };    // not obvious whether this is a runtime or compile-time const
+const int e { getValue() }; // not obvious whether this is a runtime or compile-time const
+```
+
+### Constexpr keywork
+- constexpr instead of const indicates a variable that is always a compile-time constant, therefore must be initialized with a constant expression, otherwise a compilation error witll occur
+- constexpr works for both integral and non-integral types
+- constexpr variables are implicitly const (not vice versa)
+```
+#include <iostream>
+
+int five()
+{
+    return 5;
+}
+
+int main()
+{
+    constexpr double gravity { 9.8 }; // ok: 9.8 is a constant expression
+    constexpr int sum { 4 + 5 };      // ok: 4 + 5 is a constant expression
+    constexpr int something { sum };  // ok: sum is a constant expression
+
+    std::cout << "Enter your age: ";
+    int age{};
+    std::cin >> age;
+
+    constexpr int myAge { age };      // compile error: age is not a constant expression
+    constexpr int f { five() };       // compile error: return value of five() is not a constant expression
+
+    return 0;
+}
+```
+### Constants best practice
+- Any constant var whose initializer is a constant expression should be declared as constexpr
+- Any constant var whose initializer is not a constant expression should be declared as const
+- Types that use dynamic memory allocation are not fully compatible with constexpr (use const instead of constexpr or pick a different type)
+- Function calls are evaluated at runtime therefore const function parameters are treated as runtime constants and function parameters cannot be declared as constexpr (functions that can be evaluated at compile-time exist in C++, covered later)
+
+## Conditional operator
+- 'condition ? return_if_true : return_if_false' is arithmetic
+- Best practise: parenthesize the conditional operator in a compound expression
+- If x is a constexpr, then x != 5 is a constant expression, therefore can use if constexpr
+- Avoid conditional operator in complicated expressions
+
+## Inline functions and variables
+- Perform discrete tasks, read input from user, output to file, calculate a value
+- Inline expansion is a process where a fn call is replaced by the code from the called function's definition if it's easy
+- Inline keyword (originally intended to be a hint to the compiler that a function can be inline), not used for many reasons
+- Other use for inline in modern C++ is that it means multiple definitions allowed and can be defined in multiple header files but must be the same in all cases
+- Inlines are typically defined in header files and can be included in any code file
+
+```
+pi.h
+#ifndef PI_H
+#define PI_H
+
+inline double pi() { return 3.14159; }
+
+#endif
+```
+```
+main.cpp
+#include "pi.h" // will include a copy of pi() here
+#include <iostream>
+
+double circumference(double radius); // forward declaration
+
+int main()
+{
+    std::cout << pi() << '\n';
+    std::cout << circumference(2.0) << '\n';
+
+    return 0;
+}
+```
+
+- Functions defined inside a class, struct or union type definition, constexpr/consteval fns and functions implicitly instantiated from function templates are all implicity inline
+- Don't mark as inline unless defining them in a header file
+
+
+## Constexpr and consteval functions
+- Function call to a normal function is not allowed in constant expressions
+- When using a function in variable initialization, name both the function and the variable as constexpr and both can be evaluated at compile-time
+- Arguments to a constexpr function must be known at compile time (constant expressions)
+- constexpr functions cannot have parameters declared as constexpr (so using them to initialize another constexpr variable is not possible)
+- If arguments to constexpr function are not constexpr it will instead be evaluated at run-time
+- consteval forces compile-time evaluation of a function
+- Forward function declarations for constexpr functions do not suffice, this means they may need to be defined fully in many places, to avoid violating the one-definition rule, they are explicitly inline
+- constexpr/consteval function sused in multiple s ource files should be defined in a header file so they can be included into each source file
+- consteval functions are called immediate functions
+- std::is_constant_evaluated() doesn't tell you what the compiler is doing but it will say whether or not a constexpr function can be evaluated at compile-time
+- The following shows using a const-eval helper function to determine whether a function is evaluated at compile-time or not
+```
+#include <iostream>
+
+// Uses abbreviated function template (C++20) and `auto` return type to make this function work with any type of value
+consteval auto compileTimeEval(auto value)
+{
+    return value;
+}
+
+constexpr int greater(int x, int y) // function is constexpr
+{
+    return (x > y ? x : y);
+}
+
+int main()
+{
+    std::cout << greater(5, 6) << '\n';                  // may or may not execute at compile-time
+    std::cout << compileTimeEval(greater(5, 6)) << '\n'; // will execute at compile-time
+
+    int x { 5 };
+    std::cout << greater(x, 6) << '\n';                  // we can still call the constexpr version at runtime if we wish
+
+    return 0;
+}
+```
+
+## std::string
+- C-style string variables behave oddly, avoid them, use std::string and std::string_view instead
+- std::string is the easiest way to work with strings (in \<string\> header)
+```
+int main()
+{
+  std::string name {}; // empty
+  std::string name2 { "Evan" }; //
+  name2 = "Smedley";      // Can assign (regardless of length!)
+  std::cout << "My last name is " << name2 << '\n';   // Can be outputted easily
+}
+```
+- If std::string doesn't have enough memory to store a string it will request additional memory at runtime using dynamic memory allocation (flexible but slow)
+- '>>' operator used with cin splits on whitespace so it may act differently than expected, use std::getline(...) instead (std::ws input manipulator is useful, ignores whitespace before extraction)
+```
+#include <iostream>
+#include <string> // For std::string and std::getline
+
+int main()
+{
+    std::cout << "Enter your full name: ";
+    std::string name{};
+    std::getline(std::cin >> std::ws, name); // read a full line of text into name
+
+    std::cout << "Enter your favorite color: ";
+    std::string color{};
+    std::getline(std::cin >> std::ws, color); // read a full line of text into color
+
+    std::cout << "Your name is " << name << " and your favorite color is " << color << '\n';
+
+    return 0;
+}
+```
+- std::string length cane be gotten using variable name and '.length()' (doesn't include \0), can also use std::ssize(), may need to STATIC CAST
+- Don't pass std::string to a function by value
+- It is ok to return std::string if it is a local variable, a value returned by value from another function call/operator, or a temporary value (it supports move semantics which avoids the copy)
+- "Evan"s -> suffix creates std::string instead (to access suffix use 'using namespace std::string_literals')
+- For constexpr strings use std::string_view instead
+
+## std::string_view
+- Lives in the \<string_view\> header (read only access to an existing string without making a copy)
+- Works with std::string, c-style string or even another std::string_view
+- There is no implicit conversion from std::string_view to std::string
+- Suffix can be used -> 'using namespace std::string_view_literals', "Evan"sv creates std::string_view
+- std::string_view has full support for constexpr
+- std::string_view is preferred over 'const std::string&' (passing a pointer)
+- DO NOT initialize a std::string_view with a std::string literal (it will be left dangling)
+- Modification of a std::string variable will invalidate any std::string_view instances watching that string
+- Be careful about returning std::string_view from a function if it is pointing at a std::string inside of the function that will be destroyed (different than c-style literals as they will exist for the entire program)
+- Can use remove_prefix() and remove_suffix() to modify a std::string_view's view (like closing the curtains)
